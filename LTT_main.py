@@ -62,7 +62,7 @@ def on_submit():
     c_tip = float(c_tip_entry.get())
     b = float(b_entry.get())
     n = int(n_entry.get())
-    subprocess.run("python", "LTT_20231114.py", int(v_inf), int(Re), Data_selection, c_root, c_tip, b, n)
+    subprocess.run("python", "LTT_20231114.py", ["v_inf", "Re", "Data_selection", "c_root", "c_tip", "b", "n"])
 
 window = tk.Tk()
 window.title("Input Collection")
@@ -83,7 +83,7 @@ data_selection_var = tk.StringVar()
 data_selection_entry = tk.Entry(window, textvariable=data_selection_var)
 data_selection_entry.pack()
 
-c_root_label = tk.Label(window, text="Chord Length at Wing Root (M):")
+c_root_label = tk.Label(window, text="Chord Length at Wing Root (m):")
 c_root_label.pack()
 c_root_entry = tk.Entry(window)
 c_root_entry.pack()
@@ -309,7 +309,7 @@ alpha0 = alpha_foil[cl_index]*np.pi/180 # or 2, zero lift angle of attack
 index = np.where(alpha_foil ==0)[0]
 cl0 =  CL_foil[index[0]] # lift coefficient at zero angle of attack
 cd0 = CD_foil[index[0]] # drag coefficient at zero angle of attack
-AoA = 2 # wing angle of attack 
+AoA = 6 # wing angle of attack 
 iw = 2 # wing incidence angle at the root 
 alpha_tw = 0 # twist angle
 alpha_eff = AoA + iw # effective angle of attack at wing root 
@@ -325,7 +325,6 @@ else:
     phi = np.linspace(iv,90,n)
 
 phi_r = phi*np.pi/180 # section angle [rad]
-print(phi_r)
 y = (b/2)*np.cos(phi_r) # spanwise stations [m]
 c = c_root*(1+(TR-1)*np.cos(phi_r)) # local chord [m]
 geo = (c*a0)/(2*AR*c_root*(1+TR)) # wing geometrical characteristics in one variable at different stations
@@ -337,19 +336,15 @@ for i in range(0,n):
         B[i,j] = np.sin((2*(j+1)-1)*phi_r[i]) * (geo[i]*(2*(j+1)-1)+np.sin(phi_r[i]))
 A = np.linalg.solve(B,Left)
 
-CL_w = np.pi * AR * A[0] # wing lift coefficient
+CL = np.pi * AR * A[0] # wing lift coefficient
 
 delta = 0 
 for i in range(1,n):
     delta = delta + (2*(i+1)-1)*A[i]**2/A[0]**2
 
-CD_ind = (CL_w**2/(np.pi*AR)) * (1+delta) # induced drag coefficient
+CD_ind = (CL**2/(np.pi*AR)) * (1+delta) # induced drag coefficient
 CD = cd0 + CD_ind # total drag coefficient
-print("CL_w :", CL_w)
-print("rho: ", rho)
-print("v_inf: ", v_inf)
-print("Aw :", Aw)
-L = CL_w*0.5*rho*v_inf**2*Aw*2 # Lift[N]
+L = CL*0.5*rho*v_inf**2*Aw*2 # Lift[N]
 x = np.linspace(-b/2, b/2, n)
 D_ind = CD_ind*0.5*rho*v_inf**2*Aw # Induced Drag [N]
 D = CD*0.5*rho*v_inf**2*Aw # Total Drag [N]
@@ -385,7 +380,7 @@ gamma_phi = [compute_gamma(phi_r, A, b, v_inf) for phi_r in phi_r]
 
 print("Circulation distribution :", gamma)
 print("Circulation distribution alternative:", gamma_phi)
-print("CL = ",CL_w)
+print("CL = ",CL)
 print("CD = ", CD)
 print("CD_ind = ",CD_ind)
 print("Lift (N) = ", L) # discrepancy between L and L_alt
@@ -433,7 +428,7 @@ plt.grid()
 plt.show()
 
 output = open("output.txt", "a")
-out1 = CL_w
+out1 = CL
 out2 = CD
 out3 = CD_ind
 out4 = L
@@ -551,7 +546,7 @@ def update_circulation(gamma_old, gamma_new, D):
 def check_convergence(gamma_old, gamma_new, tolerance):
 
     diff = np.abs(gamma_new - gamma_old)
-    return np.all(diff < tolerance)
+    return np.all(diff <= tolerance)
 
 max_iterations = 300
 converged = False
@@ -563,7 +558,6 @@ gamma_input = gamma_guess.copy()
 while iterations < max_iterations and not converged:
     
     dGamma_dy_new = calculate_dGamma_dy(gamma_input, dy) 
-
     alpha_i_new = calculate_induced_angle_of_attack(y, dGamma_dy_new, v_inf)
     alpha_eff_new = alpha - alpha_i_new
     cl_n = get_cl_n(alpha_eff, alpha_foil, CL_foil)
@@ -610,6 +604,15 @@ CL_new = calculate_lift_coefficient_trapezoidal(gamma_new, v_inf, S, y)
 CD_i_new = calculate_drag_coefficient_trapezoidal(gamma_new, alpha_i_new, v_inf, S, y)
 print("New lift coefficient: ", CL_new)
 print("New induced drag coefficient :", CD_i_new)
+CD_new = cd0 + CD_i_new
+print("New drag coefficient :", CD_new)
+
+
+
+
+
+
+
 
 
 
