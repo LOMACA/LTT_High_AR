@@ -47,6 +47,7 @@ rho = rho0*(P/P_ref)*(T_ref/T) # density at reference conditions [kg/m^3]
 
 v_inf = 60
 Re = 1200000
+AoA = 6 # wing angle of attack 
 Data_selection = "XFoil"
 c_root = 0.76
 c_tip = 0.29
@@ -54,15 +55,23 @@ b = 20
 n = 49 # number of sections
 
 def on_submit():
-    global v_inf, Re, Data_selection, c_root, c_tip, b, n
+    global v_inf, Re, AoA, Data_selection, c_root, c_tip, b, n
     v_inf = int(v_inf_entry.get())
     Re = int(Re_entry.get())
+    AoA = int(AoA_entry.get())
     Data_selection = data_selection_var.get()
     c_root = float(c_root_entry.get())
     c_tip = float(c_tip_entry.get())
     b = float(b_entry.get())
     n = int(n_entry.get())
-    subprocess.run("python", "LTT_20231114.py", ["v_inf", "Re", "Data_selection", "c_root", "c_tip", "b", "n"])
+    script_path = os.path.abspath("LTT_20231119.py")
+
+    command = [
+        "python", script_path, 
+        str(v_inf), str(Re), str(AoA), Data_selection, 
+        str(c_root), str(c_tip), str(b), str(n)
+    ]
+    subprocess.run(command)
 
 window = tk.Tk()
 window.title("Input Collection")
@@ -76,6 +85,11 @@ Re_label = tk.Label(window, text="Reynolds Number:")
 Re_label.pack()
 Re_entry = tk.Entry(window)
 Re_entry.pack()
+
+AoA_label = tk.Label(window, text="Angle of Attack:")
+AoA_label.pack()
+AoA_entry = tk.Entry(window)
+AoA_entry.pack()
 
 data_selection_label = tk.Label(window, text="Data Source (XFoil or Windtunnel):")
 data_selection_label.pack()
@@ -111,7 +125,7 @@ window.mainloop()
 b_half = b/2 # span of only one wing [m]
 TR = c_tip/c_root # taper ratio
 Aw = b_half*(c_root+c_tip)  # wing area
-AR = b**2/(2*Aw) # aspect ratio
+AR = 9 # b**2/(2*Aw) # aspect ratio
 
 path = r"C:\Users\Lorenzo\OneDrive - ZHAW\Studium\ZHAW Master of Science in Engineering\HS23\VT1\Model"
 
@@ -305,12 +319,11 @@ else:
     slope, intercept, r_value, p_value, std_err = stats.linregress(common_alpha, CL_foil)
 a0 = 2*np.pi # slope*np.pi/180 # or 2*pi airfoil cl slope
 cl_index = np.argmin(np.abs(CL_foil))
-alpha0 = alpha_foil[cl_index]*np.pi/180 # or 2, zero lift angle of attack
+alpha0 = -1.2*np.pi/180 # alpha_foil[cl_index]*np.pi/180 # or 2, zero lift angle of attack
 index = np.where(alpha_foil ==0)[0]
 cl0 =  CL_foil[index[0]] # lift coefficient at zero angle of attack
 cd0 = CD_foil[index[0]] # drag coefficient at zero angle of attack
-AoA = 6 # wing angle of attack 
-iw = 2 # wing incidence angle at the root 
+iw = 0 # wing incidence angle at the root 
 alpha_tw = 0 # twist angle
 alpha_eff = AoA + iw # effective angle of attack at wing root 
 alpha = np.linspace(alpha_eff+alpha_tw,alpha_eff,n)*np.pi/180 # local angle of attack [rad]
@@ -427,6 +440,8 @@ plt.title('Circulation Distribution with alternative method',fontsize=14)
 plt.grid()
 plt.show()
 
+'----------------------------------------------------------Output LTT --------------------------------------------------'
+
 output = open("output.txt", "a")
 out1 = CL
 out2 = CD
@@ -437,37 +452,43 @@ out6 = D_ind
 out7 = L_dist
 out8 = alpha_deg
 
-with open("output.txt", "a") as output:
-    
-    aoa_label = "AoA"
-    aoa_value = out8[0] if isinstance(out8, (list, np.ndarray)) and len(out8) > 0 else out8
-    output.write(f"{aoa_label}: {aoa_value}\n")
+def format_value(val, width=10, decimal_places=3):
+    if isinstance(val, float):
+        formatted_val = f"{val:.{decimal_places}f}"
+    elif isinstance(val, (list, np.ndarray)) and len(val) > 0:
+        formatted_val = format_value(val[0], width, decimal_places)
+    else:
+        formatted_val = str(val)
 
-    single_value_vars = [
-        ("CL", out1), 
-        ("CD", out2), 
-        ("CD_ind", out3), 
-        ("Lift", out4), 
-        ("Drag", out5), 
-        ("D_ind", out6)
-    ]
-    for label, value in single_value_vars:
-        if not isinstance(value, (list, np.ndarray)):
-            output.write(f"{label}: {value}\n")
+    return formatted_val.ljust(width)
 
-    array_vars = [("Lift distribution", out7)]
-    for label, array in array_vars:
-        if isinstance(array, (list, np.ndarray)):
-            output.write(f"{label}:\n")
-            for item in array:
-                output.write(f"    {item}\n")
+
+def is_file_empty(file_path):
+    return os.path.exists(file_path) and os.stat(file_path).st_size == 0
+
+file_path = "output.txt"
+
+with open(file_path, "a") as output:
+
+    if is_file_empty(file_path):
+
+        headers = ["AoA", "CL", "CD", "CD_ind", "Lift", "Drag", "D_ind"]
+        formatted_headers = [h.ljust(10) for h in headers]
+        output.write("".join(formatted_headers) + "\n")
+
+    single_value_vars = [out1, out2, out3, out4, out5, out6]
+
+    formatted_values = [format_value(val) for val in [out8] + single_value_vars]
+
+    output.write("".join(formatted_values) + "\n")
+
 
 '--------------------Accounting for non-Linearity in Stall Region-------------------------'
 
 dy = np.zeros(len(y)-1)
 
 for i in range(len(dy)):
-    dy[i] = y[i] - y[i+1]
+    dy[i] = y[i+1] - y[i]
 
 gamma_guess = np.array(gamma)
 c_n = c 
@@ -575,8 +596,8 @@ def trapezoidal_integration(y, values):
 
     integral = 0.0
     for i in range(1, len(y)):
-        delta_y = abs(y[i] - y[i - 1])  
-        integral += (values[i] + values[i - 1]) * delta_y / 2
+        delta_y = abs(y[i] - y[i-1])  
+        integral += (values[i] + values[i-1]) * delta_y / 2
     return integral
 
 def calculate_lift_coefficient_trapezoidal(gamma, v_inf, S, y):
@@ -606,17 +627,5 @@ print("New lift coefficient: ", CL_new)
 print("New induced drag coefficient :", CD_i_new)
 CD_new = cd0 + CD_i_new
 print("New drag coefficient :", CD_new)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
