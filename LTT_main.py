@@ -64,14 +64,16 @@ def on_submit():
     c_tip = float(c_tip_entry.get())
     b = float(b_entry.get())
     n = int(n_entry.get())
-    script_path = os.path.abspath("LTT_20231119.py")
+    # script_path = os.path.abspath("LTT_20231119.py")
 
+'''
     command = [
         "python", script_path, 
         str(v_inf), str(Re), str(AoA), Data_selection, 
         str(c_root), str(c_tip), str(b), str(n)
     ]
-    subprocess.run(command)
+    # subprocess.run(command)
+'''
 
 window = tk.Tk()
 window.title("Input Collection")
