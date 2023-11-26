@@ -48,7 +48,7 @@ The model also allows interpolation of airfoil data and the user does not necess
 ## Sources
 
 - Drela, M. (2000). XFOIL (Version 6.91) [Software]. MIT AeroAstro. https://web.mit.edu/drela/Public/web/xfoil/
-- Anderson, J. D. (2017). Fundamentals of aerodynamics (Sixth edition). McGraw-Hill Education.
+- Anderson, J. D. (2017). Fundamentals of aerodynamics (Sixth edition). McGraw-Hill Education. https://www.mheducation.com/highered/product/fundamentals-aerodynamics-anderson/M9781264151929.html
 - Bertin, J. J., & Cummings, R. M. (2021, August 12). Aerodynamics for Engineers. Higher Education from Cambridge University Press; Cambridge University Press. https://doi.org/10.1017/9781009105842
 
 
