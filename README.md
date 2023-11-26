@@ -1,4 +1,4 @@
-# User manual:
+# User Manual
 
 This program computes aerodynamic data using the Lifting Linear Theory as well as a Non-Linear Numerical Lifting Line Model. 
 
@@ -39,7 +39,11 @@ Once the necessary files are in the folder and the GUI has been fed with the req
 
 The model also allows interpolation of airfoil data and the user does not necessarily have to select the exact Reynolds number of the stored files. Should a Reynolds number in between two simulated Reynolds numbers be chosen, in the wind tunnel case the model automatically interpolates the data based on the closest two Reynolds number to the one chosen by the user. In the XFoil data selection case, the model calls XFoil and runs an angle of attack sequence based on the Reynolds number selected by the user. 
 
-Error avoidance:
+## Error avoidance
+
+* make sure you run the program with an angle of attack that is featured in the 2-D airfoil data or create a new text file with the data at the desired angle of attack
+* make sure to select a Reynolds number either contained in the files or else in between two existing files
+* check for the correct file name. Reminder: "Re1200000.txt" is an example for a valid file name
 
 
 
