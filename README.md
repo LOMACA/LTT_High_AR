@@ -45,6 +45,12 @@ The model also allows interpolation of airfoil data and the user does not necess
 * make sure to select a Reynolds number either contained in the files or else in between two existing files
 * check for the correct file name. Reminder: "Re1200000.txt" is an example for a valid file name
 
+## Sources
+
+- Drela, M. (2000). XFOIL (Version 6.91) [Software]. MIT AeroAstro. https://web.mit.edu/drela/Public/web/xfoil/
+- Anderson, J. D. (2017). Fundamentals of aerodynamics (Sixth edition). McGraw-Hill Education.
+- Bertin, J. J., & Cummings, R. M. (2021, August 12). Aerodynamics for Engineers. Higher Education from Cambridge University Press; Cambridge University Press. https://doi.org/10.1017/9781009105842
+
 
 
 
