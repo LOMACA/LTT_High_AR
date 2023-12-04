@@ -35,7 +35,7 @@ Initialize the model by running the code in any Python environment and a GUI for
 
 
 
-These files should be called as follows: the initials "Re" for the selected Reynolds number followed by the actual integer for the selected Reynolds number. An example would be "Re1200000.txt". Some example files containing aerodynamic coefficients for a NACA2412 airfoil created with XFoil are uploaded here and can be used as trial inputs. 
+These files should be called as follows: the initials "Re" for the selected Reynolds number followed by the integer for the selected Reynolds number. An example would be "Re1200000.txt". Some example files containing aerodynamic coefficients for a NACA2412 airfoil created with XFoil are uploaded here and can be used as trial inputs. 
 
 Once the necessary files are in the folder and the GUI has been fed with the required data, click "Submit" on the GUI and close the GUI, after which the program will run and store the wing aerodynamic data in an output file called "output.txt" in the set working directory. Currently, only one angle of attack of the wing can be simulated at a time. Therefore, should the user want a sequence of angles of attack simulated, she or he should re-run the model with a different angle of attack and the new data will be stored in the same output text file under the data of the first run. An extension of the model, where a user can select a range of angles of attack is currently worked on. 
 
