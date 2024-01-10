@@ -1,6 +1,6 @@
 # Program Structure
 
-The program has four general sections. One is the atmospheric module, where density, pressure, temperature, and air dynamic viscosity are calculated according to the ISA. The second module reads the corresponding files containing airfoil data, based on the user data source selection. The third module is the implementation of the standard LTT, based on the work of Anderson (2017) and Bertin (2021). Outputs of that module contain the lift, drag, and bending moment experienced by the wing. The fourth and last module is an extended LTT that accounts for non-linearities in the stall region at high angles of attack. 
+The program has six general sections. One is the atmospheric module, where density, pressure, temperature, and air dynamic viscosity are calculated according to the ISA. The second module takes user inputs in a GUI, such as the Reynolds number, the free stream velocity, the data source, and wing geometric properties. The third module reads airfoil polar data from the corresponding files containing airfoil data, based on the user data source selection. The fourth module is the implementation of the standard LTT, based on the work of Anderson (2017) and Bertin (2021). Outputs of that module contain the lift, drag, and bending moment experienced by the wing. The fifth module is an extended LTT that accounts for non-linearities in the stall region at high angles of attack. The sixth and last module takes care of writing the outputs computed with the classical LTT into an output text file. 
 
 # User Manual
 
